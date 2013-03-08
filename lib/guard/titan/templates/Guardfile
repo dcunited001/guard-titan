@@ -1,0 +1,13 @@
+require 'guard/titan'
+
+group :zeus do
+  guard :titan, exclude_from_all: %w(ob mail) do
+    # To Run: touch .t/all
+    set_watcher_for(:all, call: :run_all)
+
+    # To Run: touch .t/co .t/dec & etc...
+    [:co,:dec,:feat,:help,:jo,:mail,:mo,:ob].each do |cmd|
+      set_watcher_for(cmd)
+    end
+  end
+end
