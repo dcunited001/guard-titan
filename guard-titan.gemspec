@@ -1,11 +1,11 @@
 # -*- encoding: utf-8 -*-
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'guard-titan/version'
+require 'guard/titan/version'
 
 Gem::Specification.new do |gem|
   gem.name          = "guard-titan"
-  gem.version       = Guard::Titan::VERSION
+  gem.version       = Guard::TitanVersion::VERSION
   gem.authors       = ["David Conner"]
   gem.email         = ["dconner.pro@gmail.com"]
   gem.description   = %q{TODO: Write a gem description}
