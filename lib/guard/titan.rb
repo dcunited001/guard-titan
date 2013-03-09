@@ -7,7 +7,6 @@ require "guard/titan/version"
 module Guard
 
   class Titan < Guard
-    # @raise [:task_has_failed] when a method has failed
     attr_accessor :cmds, :root, :using
     attr_accessor :on_run_all, :all_cmd
     attr_accessor :exclude_from_all
@@ -21,6 +20,8 @@ module Guard
       @cmds = get_scripts
       @all_cmd = cmds.delete(:all)
       @all_cmd = zeus_test_all_default if (all_cmd.nil? || all_cmd.empty?)
+      puts all_cmd_keys
+
     end
 
     def run_all
@@ -29,10 +30,11 @@ module Guard
         put_and_notify("All:", all_cmd)
         run(all_cmd)
       when :all_keys
-        put_and_notify("All_Keys:",
-                       all_cmd_keys.join(','),"\n",
-                       all_cmd_keys.map {|k| cmds[k] }.join("\n"))
-        run(all_cmd_keys.join(' ; '))
+        put_and_notify("All_Keys:", all_cmd_keys.join(','))
+        commands = all_cmd_keys.map {|k| cmds[k] }
+        commands.each do |c|
+          run(c)
+        end
       when :recent
         put_and_notify("All Recent:", zeus_recent_cmd)
         run(zeus_recent_cmd)
@@ -70,11 +72,8 @@ module Guard
 
     def run(cmd, opts = {})
       puts '='*40
-      puts "RUNNING"
-      puts cmd
-      puts '='*40
+      puts "Running: #{cmd}"
       output = `#{cmd}`
-      puts '='*40
       puts output
     end
 
@@ -82,19 +81,20 @@ module Guard
       cmds.keys - (['all'] + exclude_from_all.map(&:to_s))
     end
 
-    # run tests that have changed since last commit
     # TODO: run at guard command prompt
     def zeus_recent_cmd(opts = {})
-
+      # run tests that have changed since last commit
       "zeus test #{since_last_commit.join(' ')}"
     end
 
     def run_on_changes(paths)
-      put_and_notify("Changed: #{paths.join(', ')}")
+      put_and_notify("Changed:", paths.join(', '))
 
+      test_all = false
       dot_tee = []
       normal_tests = paths.inject(Array.new) do |memo, p|
         if (p =~ /\.t\/(.*)$/)
+          test_all = true if ($1=='all')
           dot_tee.push($1)
         else
           memo.push(p)
@@ -102,14 +102,12 @@ module Guard
         memo
       end
 
-#      puts "WHICH_ZEUS: #{`which zeus`}"
-#      puts zeus_test(normal_tests.join(' '))
-#      puts dot_tee.join(' ; ')
-
-#      puts "="*80
-
-      run(zeus_test(normal_tests.join(' '))) if normal_tests.any?
-      run(dot_tee.join(' ; ')) if dot_tee.any?
+      if test_all
+        run_all
+      else
+        run(zeus_test(normal_tests.join(' '))) if normal_tests.any?
+        run(dot_tee.map { |k| cmds[k] }.join(' ; ')) if dot_tee.any?
+      end
     end
 
     private
@@ -122,7 +120,9 @@ module Guard
 
     def self.get_scripts(root)
       Dir.glob(File.join(root, ".t/*")).inject(Hash.new) do |memo,f|
-        memo[f] = File.read(f)
+        key = f.gsub(/^(.*)\/.t\//, '')
+        command = File.read(f)
+        memo[key] = command
         memo
       end
     end
@@ -131,9 +131,10 @@ module Guard
       self.class.get_scripts(root)
     end
 
-
-    def put_and_notify(*args)
-# hmm getting problems here
+    def put_and_notify(a,b)
+      p a, b
+#      n a, b
+# hmm getting problems with notify here
 #      puts(*args)
 #      notify(*args)
     end
