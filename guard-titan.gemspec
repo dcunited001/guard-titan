@@ -8,9 +8,10 @@ Gem::Specification.new do |gem|
   gem.version       = Guard::TitanVersion::VERSION
   gem.authors       = ["David Conner"]
   gem.email         = ["dconner.pro@gmail.com"]
-  gem.description   = %q{TODO: Write a gem description}
-  gem.summary       = %q{TODO: Write a gem summary}
+  gem.description   = %q{Run tests with Zeus using Guard Shell}
+  gem.summary       = %q{Run tests with Zeus using Guard Shell}
   gem.homepage      = ""
+  gem.license       = "LICENSE.txt"
 
   gem.files         = `git ls-files`.split($/)
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
