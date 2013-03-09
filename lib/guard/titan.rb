@@ -1,12 +1,12 @@
 require 'guard'
 require 'guard/guard'
-require 'zeus/rails'
-
-require "guard/titan/version"
+#require 'zeus/rails'
 
 module Guard
-
   class Titan < Guard
+
+    VERSION = '0.0.1'
+
     attr_accessor :cmds, :root, :using
     attr_accessor :on_run_all, :all_cmd
     attr_accessor :exclude_from_all
