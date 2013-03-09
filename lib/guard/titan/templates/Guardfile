@@ -1,9 +1,32 @@
 require 'zeus/rails'
 require 'guard/titan'
 
+# unless you use :recent,
+#   you'll need to set up groups of scripts to run
+#   in the $PROJECT_ROOT/.t folder
+#
+# e.g.:
+# make scripts: `echo 'zeus test test/models/**/*_test_rb' > .t/models`
+# run a group: `touch .t/models .t/controllers` # or .t/mo .t/co
+# run all groups: 'touch .t/all'
+
+# on_run_all: :recent
+#   when you hit enter, guard only runs
+#   the files changed since last commit
+
+# on_run_all: :all_keys
+#   when you hit enter, guard runs each script
+#   in .t folder.
+# (except all + any keys in :exclude_from_all)
+
+# on_run_all: :all
+#   runs ALL the tests...
+#   but zeus's arguments can only be so long..
+#   too many tests and you'll see: 'zeusclient.go:86: EOF'
+
 group :zeus do
-  guard :titan, root: __FILE__, on_run_all: :recent, exclude_from_all: %w(ob mail) do
-    watch /^(.t\/(.*))$/  # run whenever .t/* is touched
+  guard :titan, root: __FILE__, on_run_all: :all_keys, exclude_from_all: %w(ob mail) do
+    watch(/^(.t\/(.*))$/)
     watch(%r|^test/(.*)_test\.rb|)
   end
 end
