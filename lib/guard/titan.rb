@@ -8,67 +8,134 @@ module Guard
 
   class Titan < Guard
     # @raise [:task_has_failed] when a method has failed
-    attr_accessor :scripts
+    attr_accessor :cmds, :root, :using
+    attr_accessor :on_run_all, :all_cmd
     attr_accessor :exclude_from_all
-    attr_accessor :cmd
 
     def initialize(watchers = [], opts = {})
       super
-      @scripts = self.class.get_scripts
-      @exclude_from_all = opts[:exclude_from_all]
+      @using = opts[:using] || :minitest
+      @exclude_from_all = opts[:exclude_from_all] || []
+      @on_run_all = opts[:on_run_all] || :recent # || :all || :all_keys
+      @root = File.dirname(opts[:root])
+      @cmds = get_scripts
+      @all_cmd = cmds.delete(:all)
+      @all_cmd = zeus_test_all_default if (all_cmd.nil? || all_cmd.empty?)
     end
 
-    # run all tests
     def run_all
-      all_cmd_keys.each do |k|
-        `#{cmd[k]}`
+      case on_run_all
+      when :all
+        put_and_notify("All:", all_cmd)
+        run(all_cmd)
+      when :all_keys
+        put_and_notify("All_Keys:",
+                       all_cmd_keys.join(','),"\n",
+                       all_cmd_keys.map {|k| cmds[k] }.join("\n"))
+        run(all_cmd_keys.join(' ; '))
+      when :recent
+        put_and_notify("All Recent:", zeus_recent_cmd)
+        run(zeus_recent_cmd)
+      else
+        put_and_notify("All Recent:", zeus_recent_cmd)
+        run(zeus_recent_cmd)
       end
     end
 
-    def all_cmd_keys
-      @scripts.keys - (['all'] + exclude_from_all.map(&:to_s))
+    def zeus_test(file)
+      "zeus #{zeus_test_cmd} #{root}/#{file}"
     end
 
-    # run a list of test
-    # TODO: run at guard command prompt
-    #def run_list(*args)
-    #  opts = args.pop if args.last.is_a? Hash
-    #  `zeus test #{args.join(' ')}`
-    #end
+    def zeus_test_all_default
+      zeus_test("#{zeus_test_root}**/*_test.rb")
+    end
+
+    def zeus_test_cmd
+      case using
+        when :minitest then "test"
+        when :rspec then "spec"
+        when :testunit then "test"
+        else "test/"
+      end
+    end
+
+    def zeus_test_root
+      case using
+        when :minitest then "test/"
+        when :rspec then "spec/"
+        when :testunit then "test/"
+        else "test/"
+      end
+    end
+
+    def run(cmd, opts = {})
+      puts '='*40
+      puts "RUNNING"
+      puts cmd
+      puts '='*40
+      output = `#{cmd}`
+      puts '='*40
+      puts output
+    end
+
+    def all_cmd_keys(opts = {})
+      cmds.keys - (['all'] + exclude_from_all.map(&:to_s))
+    end
 
     # run tests that have changed since last commit
     # TODO: run at guard command prompt
-    def run_recent(opts = {})
-      `zeus test #{since_last_commit.join(' ')}`
+    def zeus_recent_cmd(opts = {})
+
+      "zeus test #{since_last_commit.join(' ')}"
+    end
+
+    def run_on_changes(paths)
+      put_and_notify("Changed: #{paths.join(', ')}")
+
+      dot_tee = []
+      normal_tests = paths.inject(Array.new) do |memo, p|
+        if (p =~ /\.t\/(.*)$/)
+          dot_tee.push($1)
+        else
+          memo.push(p)
+        end
+        memo
+      end
+
+#      puts "WHICH_ZEUS: #{`which zeus`}"
+#      puts zeus_test(normal_tests.join(' '))
+#      puts dot_tee.join(' ; ')
+
+#      puts "="*80
+
+      run(zeus_test(normal_tests.join(' '))) if normal_tests.any?
+      run(dot_tee.join(' ; ')) if dot_tee.any?
     end
 
     private
 
-    #def run(key, opts = {})
-    #  `#{cmd[key]}`
-    #end
-
     def since_last_commit
       `git status --porcelain |
       grep 'test' | grep -v 'factories' |
-      cut -c4- | sort | uniq |
-      xargs zeus test`.split("\n")
+      cut -c4- | sort | uniq`.split("\n")
     end
 
     def self.get_scripts(root)
-      Dir.glob(File.join(File.dirname(root), ".t/*")).inject(Hash.new) do |memo,f|
+      Dir.glob(File.join(root, ".t/*")).inject(Hash.new) do |memo,f|
         memo[f] = File.read(f)
         memo
       end
     end
 
-    def self.all_cmd_keys(opts = {})
-      exclude = (opts[:exclude_from_all] || [])
-      @scripts.keys - (['all'] + exclude).map(&:to_s)
+    def get_scripts
+      self.class.get_scripts(root)
     end
 
-    def all_cmd_keys(opts = {})
-      @scripts.keys
+
+    def put_and_notify(*args)
+# hmm getting problems here
+#      puts(*args)
+#      notify(*args)
     end
   end
 end
