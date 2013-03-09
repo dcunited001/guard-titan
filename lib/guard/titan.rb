@@ -20,8 +20,6 @@ module Guard
       @cmds = get_scripts
       @all_cmd = cmds.delete(:all)
       @all_cmd = zeus_test_all_default if (all_cmd.nil? || all_cmd.empty?)
-      puts all_cmd_keys
-
     end
 
     def run_all
