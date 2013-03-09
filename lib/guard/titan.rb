@@ -139,3 +139,5 @@ module Guard
     end
   end
 end
+
+require 'titan/railtie' if defined?(Rails)

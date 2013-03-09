@@ -1,0 +1,18 @@
+namespace :titan do
+  namespace :gen do
+    desc 'generate .t/all'
+    task :all do
+      `mkdir .t`
+      `touch .t/all`
+    end
+
+    desc 'generate files most commonly used for rails'
+    task :rails do
+      `echo 'zeus test test/controllers/**/*_test.rb' > .t/co`
+      `echo 'zeus test test/features/**/*_test.rb' > .t/feat`
+      `echo 'zeus test test/helpers/**/*_test.rb' > .t/help`
+      `echo 'zeus test test/jobs/**/*_test.rb' > .t/jo`
+      `echo 'zeus test test/models/**/*_test.rb' > .t/mo`
+    end
+  end
+end
