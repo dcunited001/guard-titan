@@ -3,8 +3,10 @@ module Guard
 
     def set_watcher_for(key, cmd, opts = {}, &block)
       to_run = (opts[:call] ? opts[:call].to_s : false)
-      file = ".t/#{key}"
-      watch Regexp.new("^#{file}$") do
+      key = key.gsub!(/^.*\.t\//, ".t/")
+      puts key
+      puts cmd
+      watch Regexp.new("^#{key}$") do
         put_and_notify "Running: ", key
         put_and_notify "Command: ", cmd
 
@@ -18,9 +20,11 @@ module Guard
       end
     end
 
-    def set_titan_watchers(opts = {})
-      ::Guard::Titan.all_cmd_keys.each do |k|
-        set_watcher_for(k, opts)
+    def set_titan_watchers(root, opts = {})
+      puts "GODDAMIT_WHAT_THE_FUCK"
+
+      ::Guard::Titan.get_scripts(root).each do |k,v|
+        set_watcher_for(k, v, opts)
       end
     end
 

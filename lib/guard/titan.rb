@@ -26,9 +26,9 @@ module Guard
       end
     end
 
-    #def all_cmd_keys
-    #  @scripts.keys - (['all'] + exclude_from_all.map(&:to_s))
-    #end
+    def all_cmd_keys
+      @scripts.keys - (['all'] + exclude_from_all.map(&:to_s))
+    end
 
     # run a list of test
     # TODO: run at guard command prompt
@@ -56,8 +56,8 @@ module Guard
       xargs zeus test`.split("\n")
     end
 
-    def self.get_scripts
-      Dir.glob(File.join(__FILE__, ".t/*")).inject(Hash.new) do |f, memo|
+    def self.get_scripts(root)
+      Dir.glob(File.join(File.dirname(root), ".t/*")).inject(Hash.new) do |memo,f|
         memo[f] = File.read(f)
         memo
       end
