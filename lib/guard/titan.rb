@@ -3,7 +3,6 @@ require 'guard/guard'
 require 'zeus/rails'
 
 require "guard/titan/version"
-require "guard/titan/dsl"
 
 module Guard
 
@@ -15,8 +14,8 @@ module Guard
 
     def initialize(watchers = [], opts = {})
       super
-    #  @scripts = self.class.get_scripts
-    #  @exclude_from_all = opts[:exclude_from_all]
+      @scripts = self.class.get_scripts
+      @exclude_from_all = opts[:exclude_from_all]
     end
 
     # run all tests
@@ -66,6 +65,10 @@ module Guard
     def self.all_cmd_keys(opts = {})
       exclude = (opts[:exclude_from_all] || [])
       @scripts.keys - (['all'] + exclude).map(&:to_s)
+    end
+
+    def all_cmd_keys(opts = {})
+      @scripts.keys
     end
   end
 end
