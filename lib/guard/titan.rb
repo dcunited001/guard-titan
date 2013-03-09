@@ -130,7 +130,8 @@ module Guard
     end
 
     def put_and_notify(a,b)
-      p a, b
+      puts "#{a} #{b}"
+#      p a, b
 #      n a, b
 # hmm getting problems with notify here
 #      puts(*args)
