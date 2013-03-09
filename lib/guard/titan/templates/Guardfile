@@ -1,13 +1,9 @@
+require 'zeus/rails'
 require 'guard/titan'
 
 group :zeus do
-  guard :titan, exclude_from_all: %w(ob mail) do
-    # To Run: touch .t/all
-    set_watcher_for(:all, call: :run_all)
-
-    # To Run: touch .t/co .t/dec & etc...
-    [:co,:dec,:feat,:help,:jo,:mail,:mo,:ob].each do |cmd|
-      set_watcher_for(cmd)
-    end
+  guard :titan, root: __FILE__, on_run_all: :recent, exclude_from_all: %w(ob mail) do
+    watch /^(.t\/(.*))$/  # run whenever .t/* is touched
+    watch(%r|^test/(.*)_test\.rb|)
   end
 end
