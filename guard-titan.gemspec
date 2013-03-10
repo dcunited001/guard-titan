@@ -10,8 +10,8 @@ Gem::Specification.new do |gem|
   gem.authors       = ["David Conner"]
   gem.email         = ["dconner.pro@gmail.com"]
   gem.description   = %q{Run tests with Zeus using Guard Shell}
-  gem.summary       = %q{Run tests with Zeus using Guard Shell}
-  gem.homepage      = ""
+  gem.summary       = %q{Run tests with Zeus using Guard Shell!}
+  gem.homepage      = "https://github.com/dcunited001/guard-titan"
   gem.license       = "LICENSE.txt"
 
   gem.add_dependency 'guard', '>= 0.2.0'
