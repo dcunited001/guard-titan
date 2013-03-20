@@ -4,7 +4,7 @@ require 'guard/guard'
 module Guard
   class Titan < Guard
 
-    VERSION = '0.0.1'
+    VERSION = '0.0.2'
 
     attr_accessor :cmds, :root, :using
     attr_accessor :on_run_all, :all_cmd

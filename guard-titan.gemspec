@@ -7,6 +7,7 @@ require File.expand_path('../lib/guard/titan', __FILE__)
 Gem::Specification.new do |gem|
   gem.name          = "guard-titan"
   gem.version       = Guard::Titan::VERSION
+
   gem.authors       = ["David Conner"]
   gem.email         = ["dconner.pro@gmail.com"]
   gem.description   = %q{Run tests with Zeus using Guard Shell}
