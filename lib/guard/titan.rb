@@ -1,6 +1,5 @@
 require 'guard'
 require 'guard/guard'
-#require 'zeus/rails'
 
 module Guard
   class Titan < Guard
